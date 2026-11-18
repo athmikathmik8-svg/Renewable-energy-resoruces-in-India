@@ -1,97 +1,98 @@
 # Renewable Energy Sources in India
 
-**Repository:** `Renewable_Energy_Sources_in_India`  
-**Project type:** Data science / supervised machine learning  
-**Notebook:** Google Colab-ready Jupyter notebook
+**GitHub repository:** https://github.com/athmikathmik8-svg/Renewable-energy-resoruces-in-India  
+**Project name:** `Renewable_Energy_Sources_in_India`  
+**Project type:** Data science and supervised machine learning  
+**Notebook:** Google Colab-ready
+
+[Open the notebook in Google Colab](https://colab.research.google.com/github/athmikathmik8-svg/Renewable-energy-resoruces-in-India/blob/main/Renewable_Energy_Sources_in_India_Colab.ipynb)
 
 ## Project overview
 
-This project explores state/region-level renewable energy capacity from 2006–2024 and develops a Gradient Boosting model to estimate one-year-ahead changes in total installed renewable capacity.
+This project explores state/region-level renewable energy capacity from 2006–2024 and builds a Gradient Boosting regression model to estimate one-year-ahead changes in total installed renewable capacity.
 
-- Source data: 635 rows, 10 columns, 34 states/regions, 2006–2024
-- Technology fields: bio-mass, small hydro, solar, wind and waste-to-energy
-- Prediction target: sum of the five technology capacity fields
-- Training period: eligible records through 2021 (499 rows)
-- Test period: 2022–2024 (102 rows)
-- Model: Gradient Boosting Regressor predicting year-over-year capacity change
+- Source dataset: 635 records, 10 columns, 34 states/regions, 2006–2024.
+- Five technology fields: bio-mass, small hydro, solar, wind and waste-to-energy.
+- Prediction target: sum of the five installed-capacity fields.
+- Modelling rows: 601 after creating previous-year features.
+- Training period: records through 2021 (499 rows).
+- Test period: 2022–2024 (102 rows).
+- Model: Gradient Boosting Regressor predicting year-over-year capacity change.
 
-**Unit caution:** the supplied CSV does not document the capacity unit or data provenance. The project therefore retains the original numeric unit and does not label it MW/GW.
+**Unit caution:** the supplied CSV does not document the capacity unit or provenance. Values are kept in the source unit and are not labelled MW or GW.
 
-## Start in Google Colab
+## Project chapters
 
-1. Download this repository ZIP or upload the notebook `Renewable_Energy_Sources_in_India_Colab.ipynb` to Google Colab.
+1. **Introduction:** background, problem statement, objectives and practical relevance.
+2. **Preprocessing and EDA:** data validation, target creation, lag features, cleaning and visual exploration.
+3. **Git and GitHub:** repository structure, version-control commands and collaboration workflow.
+4. **Model development:** chronological train/test split, preprocessing pipeline, Gradient Boosting and feature importance.
+5. **Results and conclusion:** MAE, RMSE, R², WAPE, baseline comparison, limitations and future work.
+
+## Run in Google Colab
+
+1. Open the Colab notebook using the link above.
 2. Run the package-install cell.
 3. Upload `renewable_energy_dataset.csv` when prompted.
 4. Run all cells from top to bottom.
-5. The notebook will create the prepared data, model outputs and charts.
+5. The notebook generates the preprocessed dataset, model, metrics, predictions and EDA plots.
 
 ## Run locally
 
 ```bash
 python -m pip install -r requirements.txt
-jupyter notebook Renewable_Energy_Sources_in_India_Colab.ipynb
-```
-
-Or run the standalone script:
-
-```bash
 python renewable_energy_model.py
 ```
 
-## Data preparation
+## Preprocessing
 
-1. Validate required columns, data types, missing values, duplicate rows, duplicate state-year pairs and negative numeric values.
-2. Sum the five installed-capacity columns to create `Total_Renewable_Capacity`.
-3. Sort by state and year.
-4. Create previous-year capacity values within each state/region.
-5. Remove the first observed row per state/region from modelling because no previous-year input exists (635 to 601 usable rows).
-6. One-hot encode `State` and median-impute numeric inputs inside a scikit-learn pipeline. There are no missing values in the original dataset, so imputation is a pipeline safeguard.
-7. Retain high-capacity states; do not automatically delete plausible capacity outliers.
-8. Avoid leakage by excluding current-year technology capacities from predictors.
+1. Check required columns, data types, missing values, duplicates, duplicate State–Year keys and negative numeric values.
+2. Calculate `Total_Renewable_Capacity` as the sum of the five technology columns.
+3. Sort by state and year and create previous-year capacity features.
+4. Remove each state's first observed row from modelling because no prior-year capacity is available.
+5. One-hot encode `State` and median-impute numeric inputs within a scikit-learn pipeline.
+6. Retain plausible high-capacity states rather than automatically deleting them as outliers.
+7. Exclude current-year technology capacities from predictors to avoid target leakage.
 
 ## Model and evaluation
 
-The Gradient Boosting model predicts the year-over-year change. The predicted change is added to the preceding year's observed total. It is evaluated chronologically, not with a random split.
+The Gradient Boosting model learns the year-over-year capacity change. Its predicted change is added to the previous year's actual total to estimate the current year's total. Data is split chronologically, not randomly.
 
-| Model | MAE | RMSE | R² | WAPE |
-|---|---:|---:|---:|---:|
-| Persistence baseline | 584.36 | 2,142.44 | 0.921 | 13.71% |
-| Gradient Boosting | 621.81 | 1,911.59 | 0.937 | 14.59% |
+On the held-out 2022–2024 records, the reported Gradient Boosting metrics are:
 
-Interpretation: Gradient Boosting has lower RMSE and higher R², while the simple previous-year baseline has lower MAE and WAPE. Neither model wins on every metric.
+- MAE: 621.81
+- RMSE: 1,911.59
+- R²: 0.937
+- WAPE: 14.59%
 
-The 2022–2024 results are a **rolling one-year-ahead backtest**. For each test year the previous year's observed capacity is used. This is not a three-year forecast from 2021 alone.
-
-## Git and GitHub
-
-Create an empty GitHub repository with this exact name: `Renewable_Energy_Sources_in_India`. From this project folder:
-
-```bash
-git init
-git config user.name "YOUR NAME"
-git config user.email "YOUR EMAIL"
-git add .
-git commit -m "Initial renewable energy data science project"
-git branch -M main
-git remote add origin https://github.com/YOUR_GITHUB_USERNAME/Renewable_Energy_Sources_in_India.git
-git push -u origin main
-```
-
-Replace the placeholders. Do not commit passwords, tokens or private data. Check that the dataset may be publicly shared before pushing it to GitHub.
+The persistence baseline (previous year's capacity carried forward) has lower MAE and WAPE, while Gradient Boosting improves RMSE and R². The model therefore does not outperform the baseline on every metric.
 
 ## Main files
 
-- `Renewable_Energy_Sources_in_India_Colab.ipynb` — notebook with explanations and Colab upload workflow
-- `renewable_energy_model.py` — standalone pipeline script
-- `renewable_energy_dataset.csv` — original input
-- `renewable_energy_preprocessed.csv` — prepared modelling table
-- `renewable_energy_backtest_predictions.csv` — test predictions
-- `renewable_energy_model_metrics.csv` — evaluation metrics
-- `renewable_energy_feature_importance.csv` — permutation feature importance
-- `renewable_energy_model.joblib` — final fitted pipeline
-- `plots/` — EDA and model diagnostics
-- `Renewable_Energy_Sources_in_India_Project_Report.pdf` — 12-page project report
+- `Renewable_Energy_Sources_in_India_Colab.ipynb` — runnable notebook with explanations.
+- `renewable_energy_model.py` — standalone Python pipeline.
+- `renewable_energy_dataset.csv` — original dataset.
+- `renewable_energy_preprocessed.csv` — modelling table with lag features.
+- `renewable_energy_backtest_predictions.csv` — held-out predictions.
+- `renewable_energy_model_metrics.csv` — model and baseline metrics.
+- `renewable_energy_feature_importance.csv` — permutation feature importance.
+- `Renewable_Energy_Sources_in_India_Project_Report.pdf` — illustrated 12-page report.
+- `plots/` — EDA and model diagnostic charts.
+- `requirements.txt` — Python dependencies.
+
+## Git workflow
+
+Clone the repository and commit future changes:
+
+```bash
+git clone https://github.com/athmikathmik8-svg/Renewable-energy-resoruces-in-India.git
+cd Renewable-energy-resoruces-in-India
+git status
+git add .
+git commit -m "Update renewable energy analysis"
+git push
+```
 
 ## Practical relevance and limitations
 
-State-level projections can support preliminary discussion of grid expansion, substations, transmission capacity and storage planning. They are not engineering recommendations. Actual planning requires verified utility, demand, generation, land, network, cost and grid-connection data. A multi-year future forecast also requires future population/GSDP inputs and a recursive forecast design.
+State-level growth estimates can support preliminary discussion of grid expansion, substations, transmission capacity and storage planning. They are not engineering recommendations. Actual planning needs verified demand, generation, utility, network, land, cost and grid-connection information. Multi-year forecasts also need future population/GSDP inputs and a validated recursive forecast design.
